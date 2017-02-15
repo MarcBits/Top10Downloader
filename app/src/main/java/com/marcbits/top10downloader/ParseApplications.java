@@ -9,7 +9,9 @@ import java.io.StringReader;
 import java.util.ArrayList;
 
 /**
- * TODO: Add a class header comment!
+ * Created by marc on 2/15/17
+ * for MarcBits
+ * Contact: marcbits_at_outlook_dot_com
  */
 
 public class ParseApplications {
