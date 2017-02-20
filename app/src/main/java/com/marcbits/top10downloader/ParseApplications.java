@@ -43,7 +43,7 @@ public class ParseApplications {
                 String tagName = xpp.getName();
                 switch (eventType) {
                     case XmlPullParser.START_TAG:
-                        Log.d(TAG, "parse: Starting tag for " + tagName);
+//                        Log.d(TAG, "parse: Starting tag for " + tagName);
 
                         if ("entry".equalsIgnoreCase(tagName)) {
                             inEntry = true;
@@ -82,10 +82,10 @@ public class ParseApplications {
                 eventType = xpp.next();
             }
 
-            for (FeedEntry app : mApplications) {
-                Log.d(TAG, "parse: ************");
-                Log.d(TAG, "parse: " + app.toString());
-            }
+//            for (FeedEntry app : mApplications) {
+//                Log.d(TAG, "parse: ************");
+//                Log.d(TAG, "parse: " + app.toString());
+//            }
         } catch (Exception e) {
             status = false;
             e.printStackTrace();
