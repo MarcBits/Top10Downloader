@@ -2,6 +2,7 @@ package com.marcbits.top10downloader;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -22,40 +23,97 @@ public class MainActivity extends AppCompatActivity {
     private String feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=%d/xml";
     private int feedLimit = 10;
 
+    private static final String STATE_FEED_URL = "currentFeedUrl";
+    public static final String STATE_FEED_LIMIT = "currentFeedLimit";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         listApps = (ListView) findViewById(R.id.xmlListView);
 
-        downloadUrl("http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=10/xml");
+        if(savedInstanceState != null) {
+            feedUrl = savedInstanceState.getString(MainActivity.STATE_FEED_URL);
+            feedLimit = savedInstanceState.getInt(MainActivity.STATE_FEED_LIMIT);
+        }
+
+        Log.d(TAG, "onCreate: feedUrl: " + feedUrl);
+        Log.d(TAG, "onCreate: feedLimit: " + feedLimit);
+
+        downloadUrl(String.format(feedUrl, feedLimit));
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString(STATE_FEED_URL, feedUrl);
+        outState.putInt(STATE_FEED_LIMIT, feedLimit);
+    }
+
+//    @Override
+//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//
+//        Log.d(TAG, "onRestoreInstanceState: ");
+//
+//        feedUrl = savedInstanceState.getString(MainActivity.STATE_FEED_URL);
+//        feedLimit = savedInstanceState.getInt(MainActivity.STATE_FEED_LIMIT);
+//
+//        Log.d(TAG, "onRestoreInstanceState: feedUrl: " + feedUrl);
+//        Log.d(TAG, "onRestoreInstanceState: feedLimit: " + feedLimit);
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.feeds_menu, menu);
+
+        if(feedLimit == 10) {
+            menu.findItem(R.id.mnu10).setChecked(true);
+        } else {
+            menu.findItem(R.id.mnu25).setChecked(true);
+        }
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        String feedUrl;
 
         switch(id) {
+            case R.id.mnuRefresh:
+                downloadUrl(String.format(feedUrl, feedLimit));
+                break;
             case R.id.mnuFree:
-                feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=10/xml";
+                feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=%d/xml";
+                downloadUrl(String.format(feedUrl, feedLimit));
                 break;
             case R.id.mnuPaid:
-                feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/toppaidapplications/limit=10/xml";
+                feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/toppaidapplications/limit=%d/xml";
+                downloadUrl(String.format(feedUrl, feedLimit));
                 break;
             case R.id.mnuSongs:
-                feedUrl= "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topsongs/limit=10/xml";
+                feedUrl= "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topsongs/limit=%d/xml";
+                downloadUrl(String.format(feedUrl, feedLimit));
+                break;
+            case R.id.mnu10:
+            case R.id.mnu25:
+                if (!item.isChecked()) {
+                    item.setChecked(true);
+                    feedLimit = 35 - feedLimit;
+                    Log.d(TAG, "onOptionsItemSelected: " + item.getTitle() + " setting feedlimit to " + feedLimit);
+
+                    Log.d(TAG, "onOptionsItemSelected: Downloading data...");
+                    downloadUrl(String.format(feedUrl, feedLimit));
+                } else {
+                    Log.d(TAG, "onOptionsItemSelected: " + item.getTitle() + " feedlimit unchanged.");
+                }
                 break;
             default:
                 return super.onOptionsItemSelected(item);
         }
-        downloadUrl(feedUrl);
+
         return true;
     }
 
