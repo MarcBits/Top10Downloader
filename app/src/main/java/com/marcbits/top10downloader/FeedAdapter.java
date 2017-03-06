@@ -16,14 +16,14 @@ import java.util.List;
  * Contact: marcbits_at_outlook_dot_com
  */
 
-public class FeedAdapter extends ArrayAdapter {
+public class FeedAdapter<T extends FeedEntry> extends ArrayAdapter {
     private static final String TAG = "FeedAdapter";
 
     private final int mLayoutResource;
     private final LayoutInflater mLayoutInflater;
-    private List<FeedEntry> mApplications;
+    private List<T> mApplications;
 
-    public FeedAdapter(Context pContext, int pResource, List<FeedEntry> pApplications) {
+    public FeedAdapter(Context pContext, int pResource, List<T> pApplications) {
         super(pContext, pResource);
         this.mLayoutResource = pResource;
         this.mLayoutInflater = LayoutInflater.from(pContext);
@@ -50,7 +50,7 @@ public class FeedAdapter extends ArrayAdapter {
             viewHolder = (ViewHolder) pConvertView.getTag();
         }
 
-        FeedEntry currentApp = mApplications.get(pPosition);
+        T currentApp = mApplications.get(pPosition);
 
         viewHolder.tvName.setText(currentApp.getName());
         viewHolder.tvArtist.setText(currentApp.getArtist());
